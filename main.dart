@@ -32,19 +32,19 @@ class MapSampleState extends State<MapSample> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = {};
-  String _drawer_name = "";
-  String _drawer_place = "";
-  String _drawer_monday = "";
-  String _drawer_tuesday = "";
-  String _drawer_wednesday = "";
-  String _drawer_thursday = "";
-  String _drawer_friday = "";
-  String _drawer_saturday = "";
-  String _drawer_sunday = "";
-  String _drawer_address = "";
-  String _drawer_tel = "";
-  String _drawer_note = "";
-  String _drawer_quote = "";
+  TextEditingController name = TextEditingController(text: "");
+  TextEditingController installationPlace = TextEditingController(text: "");
+  TextEditingController monday = TextEditingController(text: "");
+  TextEditingController tuesday = TextEditingController(text: "");
+  TextEditingController wednesday = TextEditingController(text: "");
+  TextEditingController thursday = TextEditingController(text: "");
+  TextEditingController friday = TextEditingController(text: "");
+  TextEditingController saturday = TextEditingController(text: "");
+  TextEditingController sunday = TextEditingController(text: "");
+  TextEditingController address = TextEditingController(text: "");
+  TextEditingController tel = TextEditingController(text: "");
+  TextEditingController note = TextEditingController(text: "");
+  TextEditingController quote = TextEditingController(text: "");
   static const double textSmall = 8;
   static const double textMedium = 12;
   static const double textLarge = 18;
@@ -54,7 +54,7 @@ class MapSampleState extends State<MapSample> {
     super.initState();
     _loading = true;
     _getUserLocation();
-    _createMarkers(marker_tapped);
+    _createMarkers(markerTapped);
   }
 
   void _getUserLocation() async {
@@ -131,71 +131,126 @@ class MapSampleState extends State<MapSample> {
 
   MapDrawer() {
     return Drawer(
-      child: ListView(
-        padding: const EdgeInsets.only(top: 18),
-        children: [
-          ListTile(
-            title: Text(
-              _drawer_name,
-              style: const TextStyle(fontSize: textLarge),
-            ),
-          ),
-          const ListTile(
-            title: Text(
-              '設置場所',
-            ),
-          ),
-          ListTile(
-            title: Text(
-              _drawer_place,
-            ),
-          ),
-          ListTile(
-            title: Text('''営業時間
-月曜日 : $_drawer_monday
-火曜日 : $_drawer_tuesday
-水曜日 : $_drawer_wednesday
-木曜日 : $_drawer_thursday
-金曜日 : $_drawer_friday
-土曜日 : $_drawer_saturday
-日曜日 : $_drawer_sunday'''),
-          ),
-          ListTile(
-            title: Text('''住所
-$_drawer_address'''),
-          ),
-          ListTile(
-            title: Text('''電話番号
-$_drawer_tel'''),
-          ),
-          ListTile(
-            title: Text('''備考
-$_drawer_note'''),
-          ),
-          ListTile(
-            title: Text('''引用
-$_drawer_quote'''),
-          ),
-        ],
-      ),
-    );
+        child: SingleChildScrollView(
+            child: Container(
+                padding: const EdgeInsets.all(10),
+                child: Column(children: [
+                  const Padding(padding: EdgeInsets.only(top: 10)),
+                  TextField(
+                    controller: name,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "名称",
+                    ),
+                  ),
+                  TextField(
+                    controller: installationPlace,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "設置場所",
+                    ),
+                  ),
+                  TextField(
+                    controller: monday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "月曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: tuesday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "火曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: wednesday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "水曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: thursday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "木曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: friday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "金曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: saturday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "土曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: sunday,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "日曜日",
+                    ),
+                  ),
+                  TextField(
+                    controller: address,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "住所",
+                    ),
+                  ),
+                  TextField(
+                    controller: tel,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "電話番号",
+                    ),
+                  ),
+                  TextField(
+                    controller: note,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "備考",
+                    ),
+                  ),
+                  TextField(
+                    controller: quote,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      labelText: "引用",
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: const Text(
+                      "更新",
+                    ),
+                  ),
+                ]))));
   }
 
-  marker_tapped(Place place) {
+  markerTapped(Place place) {
     setState(() {
-      _drawer_name = place.name;
-      _drawer_place = place.place;
-      _drawer_monday = place.monday;
-      _drawer_tuesday = place.tuesday;
-      _drawer_wednesday = place.wednesday;
-      _drawer_thursday = place.thursday;
-      _drawer_friday = place.friday;
-      _drawer_saturday = place.saturday;
-      _drawer_sunday = place.sunday;
-      _drawer_address = place.address;
-      _drawer_tel = place.tel;
-      _drawer_note = place.note;
-      _drawer_quote = place.quote;
+      name = TextEditingController(text: place.name);
+      installationPlace = TextEditingController(text: place.installationPlace);
+      monday = TextEditingController(text: place.monday);
+      tuesday = TextEditingController(text: place.tuesday);
+      wednesday = TextEditingController(text: place.wednesday);
+      thursday = TextEditingController(text: place.thursday);
+      friday = TextEditingController(text: place.friday);
+      saturday = TextEditingController(text: place.saturday);
+      sunday = TextEditingController(text: place.sunday);
+      address = TextEditingController(text: place.address);
+      tel = TextEditingController(text: place.tel);
+      note = TextEditingController(text: place.note);
+      quote = TextEditingController(text: place.quote);
     });
     _scaffoldKey.currentState?.openDrawer();
   }
@@ -203,7 +258,7 @@ $_drawer_quote'''),
   void _createMarkers(void Function(Place) callback) async {
     final storesStream =
         await FirebaseFirestore.instance.collection('maps').get();
-    Set<Marker> __markers = {};
+    Set<Marker> lMarkers = {};
     int key = 0;
     for (var document in storesStream.docs) {
       var now = DateTime.now();
@@ -263,7 +318,7 @@ $_drawer_quote'''),
 
       Place place = Place(
         name: document['name'],
-        place: document['place'],
+        installationPlace: document['place'],
         monday: document['monday'],
         tuesday: document['tuesday'],
         wednesday: document['wednesday'],
@@ -277,7 +332,7 @@ $_drawer_quote'''),
         quote: document['quote'],
       );
 
-      __markers.add(Marker(
+      lMarkers.add(Marker(
         icon: BitmapDescriptor.defaultMarkerWithHue(makerColor),
         markerId: MarkerId(key.toString()),
         position: LatLng(document['lat'], document['lng']),
@@ -286,7 +341,7 @@ $_drawer_quote'''),
       key++;
     }
     setState(() {
-      _markers = __markers;
+      _markers = lMarkers;
     });
   }
 }
@@ -294,7 +349,7 @@ $_drawer_quote'''),
 //ドロワーで使用
 class Place {
   String name;
-  String place;
+  String installationPlace;
   String monday;
   String tuesday;
   String wednesday;
@@ -308,7 +363,7 @@ class Place {
   String quote;
   Place(
       {this.name = "",
-      this.place = "",
+      this.installationPlace = "",
       this.monday = "",
       this.tuesday = "",
       this.wednesday = "",
