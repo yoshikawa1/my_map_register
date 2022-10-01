@@ -32,6 +32,7 @@ class MapSampleState extends State<MapSample> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = {};
+  TextEditingController documentId = TextEditingController(text: "");
   TextEditingController name = TextEditingController(text: "");
   TextEditingController installationPlace = TextEditingController(text: "");
   TextEditingController monday = TextEditingController(text: "");
@@ -130,114 +131,142 @@ class MapSampleState extends State<MapSample> {
   }
 
   MapDrawer() {
-    return Drawer(
-        child: SingleChildScrollView(
-            child: Container(
+    return Column(
+      children: [
+        Expanded(
+          child: Drawer(
+            child: SingleChildScrollView(
+              child: Container(
                 padding: const EdgeInsets.all(10),
-                child: Column(children: [
-                  const Padding(padding: EdgeInsets.only(top: 10)),
-                  TextField(
-                    controller: name,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "名称",
+                child: Column(
+                  children: [
+                    Visibility(
+                      visible: false,
+                      child: TextField(
+                        controller: documentId,
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          labelText: "ID",
+                        ),
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: installationPlace,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "設置場所",
+                    TextField(
+                      controller: name,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "名称",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: monday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "月曜日",
+                    TextField(
+                      controller: installationPlace,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "設置場所",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: tuesday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "火曜日",
+                    TextField(
+                      controller: monday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "月曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: wednesday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "水曜日",
+                    TextField(
+                      controller: tuesday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "火曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: thursday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "木曜日",
+                    TextField(
+                      controller: wednesday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "水曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: friday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "金曜日",
+                    TextField(
+                      controller: thursday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "木曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: saturday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "土曜日",
+                    TextField(
+                      controller: friday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "金曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: sunday,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "日曜日",
+                    TextField(
+                      controller: saturday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "土曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: address,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "住所",
+                    TextField(
+                      controller: sunday,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "日曜日",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: tel,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "電話番号",
+                    TextField(
+                      controller: address,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "住所",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: note,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "備考",
+                    TextField(
+                      controller: tel,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "電話番号",
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: quote,
-                    maxLines: null,
-                    decoration: const InputDecoration(
-                      labelText: "引用",
+                    TextField(
+                      controller: note,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "備考",
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "更新",
+                    TextField(
+                      controller: quote,
+                      maxLines: null,
+                      decoration: const InputDecoration(
+                        labelText: "引用",
+                      ),
                     ),
-                  ),
-                ]))));
+                    ElevatedButton(
+                      onPressed: () {
+                        print(documentId.text);
+                        FirebaseFirestore.instance
+                            .collection("maps")
+                            .doc(documentId.text)
+                            .update({'name': 'aa', 'place': 'bb'});
+                      },
+                      child: const Text(
+                        "更新",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+      ],
+    );
   }
 
   markerTapped(Place place) {
     setState(() {
+      documentId = TextEditingController(text: place.documentId);
       name = TextEditingController(text: place.name);
       installationPlace = TextEditingController(text: place.installationPlace);
       monday = TextEditingController(text: place.monday);
@@ -258,8 +287,11 @@ class MapSampleState extends State<MapSample> {
   void _createMarkers(void Function(Place) callback) async {
     final storesStream =
         await FirebaseFirestore.instance.collection('maps').get();
+    final storesStreamS =
+        await FirebaseFirestore.instance.collection('maps').snapshots();
     Set<Marker> lMarkers = {};
     int key = 0;
+    storesStreamS.first;
     for (var document in storesStream.docs) {
       var now = DateTime.now();
       String businessHours = "";
@@ -317,6 +349,7 @@ class MapSampleState extends State<MapSample> {
       }
 
       Place place = Place(
+        documentId: document.id,
         name: document['name'],
         installationPlace: document['place'],
         monday: document['monday'],
@@ -348,6 +381,7 @@ class MapSampleState extends State<MapSample> {
 
 //ドロワーで使用
 class Place {
+  String documentId;
   String name;
   String installationPlace;
   String monday;
@@ -361,18 +395,20 @@ class Place {
   String tel;
   String note;
   String quote;
-  Place(
-      {this.name = "",
-      this.installationPlace = "",
-      this.monday = "",
-      this.tuesday = "",
-      this.wednesday = "",
-      this.thursday = "",
-      this.friday = "",
-      this.saturday = "",
-      this.sunday = "",
-      this.address = "",
-      this.tel = "",
-      this.note = "",
-      this.quote = ""});
+  Place({
+    this.documentId = "",
+    this.name = "",
+    this.installationPlace = "",
+    this.monday = "",
+    this.tuesday = "",
+    this.wednesday = "",
+    this.thursday = "",
+    this.friday = "",
+    this.saturday = "",
+    this.sunday = "",
+    this.address = "",
+    this.tel = "",
+    this.note = "",
+    this.quote = "",
+  });
 }
