@@ -291,7 +291,6 @@ class MapSampleState extends State<MapSample> {
         await FirebaseFirestore.instance.collection('maps').snapshots();
     Set<Marker> lMarkers = {};
     int key = 0;
-    storesStreamS.first;
     for (var document in storesStream.docs) {
       var now = DateTime.now();
       String businessHours = "";
