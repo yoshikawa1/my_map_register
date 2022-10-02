@@ -287,8 +287,6 @@ class MapSampleState extends State<MapSample> {
   void _createMarkers(void Function(Place) callback) async {
     final storesStream =
         await FirebaseFirestore.instance.collection('maps').get();
-    final storesStreamS =
-        await FirebaseFirestore.instance.collection('maps').snapshots();
     Set<Marker> lMarkers = {};
     int key = 0;
     for (var document in storesStream.docs) {
