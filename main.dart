@@ -49,6 +49,7 @@ class MapSampleState extends State<MapSample> {
   static const double textSmall = 8;
   static const double textMedium = 12;
   static const double textLarge = 18;
+  String result = "";
 
   @override
   void initState() {
@@ -98,36 +99,38 @@ class MapSampleState extends State<MapSample> {
 
   MapContainer() {
     return Expanded(
-        child: Container(
-            width: 1000,
-            height: 1500,
-            child: Scaffold(
-              key: _scaffoldKey,
-              drawer: MapDrawer(),
-              body: _loading
-                  ? const CircularProgressIndicator()
-                  : SafeArea(
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          GoogleMap(
-                            initialCameraPosition: CameraPosition(
-                              target: _initialPosition,
-                              zoom: 15,
-                            ),
-                            markers: _markers,
-                            onMapCreated: (GoogleMapController controller) {
-                              _controller.complete(controller);
-                            },
-                            myLocationEnabled: true,
-                            myLocationButtonEnabled: true,
-                            mapToolbarEnabled: false,
-                            buildingsEnabled: true,
-                          ),
-                        ],
+      child: Container(
+        width: 1000,
+        height: 1500,
+        child: Scaffold(
+          key: _scaffoldKey,
+          drawer: MapDrawer(),
+          body: _loading
+              ? const CircularProgressIndicator()
+              : SafeArea(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: _initialPosition,
+                          zoom: 15,
+                        ),
+                        markers: _markers,
+                        onMapCreated: (GoogleMapController controller) {
+                          _controller.complete(controller);
+                        },
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        mapToolbarEnabled: false,
+                        buildingsEnabled: true,
                       ),
-                    ),
-            )));
+                    ],
+                  ),
+                ),
+        ),
+      ),
+    );
   }
 
   MapDrawer() {
@@ -243,16 +246,33 @@ class MapSampleState extends State<MapSample> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        print(documentId.text);
                         FirebaseFirestore.instance
                             .collection("maps")
                             .doc(documentId.text)
-                            .update({'name': 'aa', 'place': 'bb'});
+                            .update({
+                          'name': name.text,
+                          'place': installationPlace.text,
+                          'monday': monday.text,
+                          'tuesday': tuesday.text,
+                          'wednesday': wednesday.text,
+                          'thursday': thursday.text,
+                          'friday': friday.text,
+                          'saturday': saturday.text,
+                          'sunday': sunday.text,
+                          'address': address.text,
+                          'tel': tel.text,
+                          'note': note.text,
+                          'quote': quote.text,
+                        });
+                        setState(() {
+                          result = "更新されました";
+                        });
                       },
                       child: const Text(
                         "更新",
                       ),
                     ),
+                    Text(result, style: const TextStyle(fontSize: 20)),
                   ],
                 ),
               ),
@@ -264,22 +284,27 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-  markerTapped(Place place) {
+  markerTapped(Place place) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(place.documentId)
+        .get();
     setState(() {
       documentId = TextEditingController(text: place.documentId);
-      name = TextEditingController(text: place.name);
-      installationPlace = TextEditingController(text: place.installationPlace);
-      monday = TextEditingController(text: place.monday);
-      tuesday = TextEditingController(text: place.tuesday);
-      wednesday = TextEditingController(text: place.wednesday);
-      thursday = TextEditingController(text: place.thursday);
-      friday = TextEditingController(text: place.friday);
-      saturday = TextEditingController(text: place.saturday);
-      sunday = TextEditingController(text: place.sunday);
-      address = TextEditingController(text: place.address);
-      tel = TextEditingController(text: place.tel);
-      note = TextEditingController(text: place.note);
-      quote = TextEditingController(text: place.quote);
+      name = TextEditingController(text: doc.get('name'));
+      installationPlace = TextEditingController(text: doc.get('place'));
+      monday = TextEditingController(text: doc.get('monday'));
+      tuesday = TextEditingController(text: doc.get('tuesday'));
+      wednesday = TextEditingController(text: doc.get('wednesday'));
+      thursday = TextEditingController(text: doc.get('thursday'));
+      friday = TextEditingController(text: doc.get('friday'));
+      saturday = TextEditingController(text: doc.get('saturday'));
+      sunday = TextEditingController(text: doc.get('sunday'));
+      address = TextEditingController(text: doc.get('address'));
+      tel = TextEditingController(text: doc.get('tel'));
+      note = TextEditingController(text: doc.get('note'));
+      quote = TextEditingController(text: doc.get('quote'));
+      result = "";
     });
     _scaffoldKey.currentState?.openDrawer();
   }
@@ -292,7 +317,7 @@ class MapSampleState extends State<MapSample> {
     for (var document in storesStream.docs) {
       var now = DateTime.now();
       String businessHours = "";
-      double makerColor;
+      double markerColor;
 
       switch (now.weekday) {
         case 1:
@@ -321,12 +346,12 @@ class MapSampleState extends State<MapSample> {
 
       //営業中か判定
       if (businessHours == "-") {
-        makerColor = BitmapDescriptor.hueAzure;
+        markerColor = BitmapDescriptor.hueAzure;
       } else if (businessHours == "") {
-        makerColor = BitmapDescriptor.hueGreen;
+        markerColor = BitmapDescriptor.hueGreen;
       } else {
         var businessHourSplit = businessHours.split(",");
-        makerColor = BitmapDescriptor.hueAzure;
+        markerColor = BitmapDescriptor.hueAzure;
         for (var businessHour in businessHourSplit) {
           var splitTime = businessHour.split("～");
           String openHour = splitTime[0].split(":")[0];
@@ -339,7 +364,7 @@ class MapSampleState extends State<MapSample> {
               int.parse(closeHour), int.parse(closeMinute));
 
           if (openTime.isBefore(now) & now.isBefore(closeTime)) {
-            makerColor = BitmapDescriptor.hueRed;
+            markerColor = BitmapDescriptor.hueRed;
             break;
           }
         }
@@ -347,23 +372,10 @@ class MapSampleState extends State<MapSample> {
 
       Place place = Place(
         documentId: document.id,
-        name: document['name'],
-        installationPlace: document['place'],
-        monday: document['monday'],
-        tuesday: document['tuesday'],
-        wednesday: document['wednesday'],
-        thursday: document['thursday'],
-        friday: document['friday'],
-        saturday: document['saturday'],
-        sunday: document['sunday'],
-        address: document['address'],
-        tel: document['tel'],
-        note: document['note'],
-        quote: document['quote'],
       );
 
       lMarkers.add(Marker(
-        icon: BitmapDescriptor.defaultMarkerWithHue(makerColor),
+        icon: BitmapDescriptor.defaultMarkerWithHue(markerColor),
         markerId: MarkerId(key.toString()),
         position: LatLng(document['lat'], document['lng']),
         onTap: () => callback(place),
@@ -379,33 +391,7 @@ class MapSampleState extends State<MapSample> {
 //ドロワーで使用
 class Place {
   String documentId;
-  String name;
-  String installationPlace;
-  String monday;
-  String tuesday;
-  String wednesday;
-  String thursday;
-  String friday;
-  String saturday;
-  String sunday;
-  String address;
-  String tel;
-  String note;
-  String quote;
   Place({
     this.documentId = "",
-    this.name = "",
-    this.installationPlace = "",
-    this.monday = "",
-    this.tuesday = "",
-    this.wednesday = "",
-    this.thursday = "",
-    this.friday = "",
-    this.saturday = "",
-    this.sunday = "",
-    this.address = "",
-    this.tel = "",
-    this.note = "",
-    this.quote = "",
   });
 }
