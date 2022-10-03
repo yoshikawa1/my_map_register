@@ -143,16 +143,6 @@ class MapSampleState extends State<MapSample> {
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-                    Visibility(
-                      visible: false,
-                      child: TextField(
-                        controller: documentId,
-                        maxLines: null,
-                        decoration: const InputDecoration(
-                          labelText: "ID",
-                        ),
-                      ),
-                    ),
                     TextField(
                       controller: name,
                       maxLines: null,
@@ -244,6 +234,17 @@ class MapSampleState extends State<MapSample> {
                         labelText: "引用",
                       ),
                     ),
+                    Visibility(
+                      visible: true,
+                      child: TextField(
+                        enabled: false,
+                        controller: documentId,
+                        maxLines: null,
+                        decoration: const InputDecoration(
+                          labelText: "ID",
+                        ),
+                      ),
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         FirebaseFirestore.instance
@@ -284,13 +285,12 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-  markerTapped(Place place) async {
+  markerTapped(String documentIdS) async {
     final doc = await FirebaseFirestore.instance
         .collection('maps')
-        .doc(place.documentId)
+        .doc(documentIdS)
         .get();
     setState(() {
-      documentId = TextEditingController(text: place.documentId);
       name = TextEditingController(text: doc.get('name'));
       installationPlace = TextEditingController(text: doc.get('place'));
       monday = TextEditingController(text: doc.get('monday'));
@@ -304,16 +304,16 @@ class MapSampleState extends State<MapSample> {
       tel = TextEditingController(text: doc.get('tel'));
       note = TextEditingController(text: doc.get('note'));
       quote = TextEditingController(text: doc.get('quote'));
+      documentId = TextEditingController(text: documentIdS);
       result = "";
     });
     _scaffoldKey.currentState?.openDrawer();
   }
 
-  void _createMarkers(void Function(Place) callback) async {
+  void _createMarkers(void Function(String) callback) async {
     final storesStream =
         await FirebaseFirestore.instance.collection('maps').get();
     Set<Marker> lMarkers = {};
-    int key = 0;
     for (var document in storesStream.docs) {
       var now = DateTime.now();
       String businessHours = "";
@@ -370,28 +370,16 @@ class MapSampleState extends State<MapSample> {
         }
       }
 
-      Place place = Place(
-        documentId: document.id,
-      );
-
       lMarkers.add(Marker(
         icon: BitmapDescriptor.defaultMarkerWithHue(markerColor),
-        markerId: MarkerId(key.toString()),
+        markerId: MarkerId(document.id),
         position: LatLng(document['lat'], document['lng']),
-        onTap: () => callback(place),
+        onTap: () => callback(document.id),
       ));
-      key++;
     }
+
     setState(() {
       _markers = lMarkers;
     });
   }
-}
-
-//ドロワーで使用
-class Place {
-  String documentId;
-  Place({
-    this.documentId = "",
-  });
 }
