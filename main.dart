@@ -116,11 +116,20 @@ class MapSampleState extends State<MapSample> {
                     fit: StackFit.expand,
                     children: [
                       GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: _initialPosition,
-                          zoom: 15,
-                        ),
+                        initialCameraPosition:
+                            CameraPosition(target: _initialPosition, zoom: 15),
                         markers: _markers,
+                        onLongPress: (LatLng latLng) {
+                          setState(() {
+                            _markers.add(Marker(
+                              icon: BitmapDescriptor.defaultMarkerWithHue(
+                                  BitmapDescriptor.hueYellow),
+                              markerId: const MarkerId('marker_1'),
+                              position: latLng,
+                              // onTap: () => callback(""),
+                            ));
+                          });
+                        },
                         onMapCreated: (GoogleMapController controller) {
                           _controller.complete(controller);
                         },
@@ -148,146 +157,100 @@ class MapSampleState extends State<MapSample> {
                 child: Column(
                   children: [
                     TextField(
-                      controller: name,
-                      maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "名称",
-                      ),
-                    ),
+                        controller: name,
+                        maxLines: null,
+                        decoration: const InputDecoration(labelText: "名称")),
                     TextField(
                       controller: installationPlace,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "設置場所",
-                      ),
+                      decoration: const InputDecoration(labelText: "設置場所"),
                     ),
                     TextField(
                       controller: monday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "月曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "月曜日"),
                     ),
                     TextField(
                       controller: tuesday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "火曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "火曜日"),
                     ),
                     TextField(
                       controller: wednesday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "水曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "水曜日"),
                     ),
                     TextField(
                       controller: thursday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "木曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "木曜日"),
                     ),
                     TextField(
                       controller: friday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "金曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "金曜日"),
                     ),
                     TextField(
                       controller: saturday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "土曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "土曜日"),
                     ),
                     TextField(
                       controller: sunday,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "日曜日",
-                      ),
+                      decoration: const InputDecoration(labelText: "日曜日"),
                     ),
                     TextField(
                       controller: address,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "住所",
-                      ),
+                      decoration: const InputDecoration(labelText: "住所"),
                     ),
                     TextField(
                       controller: tel,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "電話番号",
-                      ),
+                      decoration: const InputDecoration(labelText: "電話番号"),
                     ),
                     TextField(
                       controller: note,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "備考",
-                      ),
+                      decoration: const InputDecoration(labelText: "備考"),
                     ),
                     TextField(
                       controller: quote,
                       maxLines: null,
-                      decoration: const InputDecoration(
-                        labelText: "引用",
-                      ),
+                      decoration: const InputDecoration(labelText: "引用"),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                        alignment: Alignment.centerLeft,
+                        width: double.infinity,
+                        child: const Text("ID", textAlign: TextAlign.left)),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: Text(documentId, textAlign: TextAlign.left),
                     ),
                     const SizedBox(height: 10),
                     Container(
                       alignment: Alignment.centerLeft,
                       width: double.infinity,
-                      child: const Text(
-                        "ID",
-                        textAlign: TextAlign.left,
-                      ),
+                      child: const Text("更新日時", textAlign: TextAlign.left),
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
                       width: double.infinity,
-                      child: Text(
-                        documentId,
-                        textAlign: TextAlign.left,
-                      ),
+                      child: Text(updateTime, textAlign: TextAlign.left),
                     ),
                     const SizedBox(height: 10),
                     Container(
                       alignment: Alignment.centerLeft,
                       width: double.infinity,
-                      child: const Text(
-                        "更新日時",
-                        textAlign: TextAlign.left,
-                      ),
+                      child: const Text("更新者", textAlign: TextAlign.left),
                     ),
                     Container(
                       alignment: Alignment.centerLeft,
                       width: double.infinity,
-                      child: Text(
-                        updateTime,
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      width: double.infinity,
-                      child: const Text(
-                        "更新者",
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      width: double.infinity,
-                      child: Text(
-                        updateId,
-                        textAlign: TextAlign.left,
-                      ),
+                      child: Text(updateId, textAlign: TextAlign.left),
                     ),
                     ElevatedButton(
                       onPressed: () async {
@@ -317,9 +280,7 @@ class MapSampleState extends State<MapSample> {
                           result = "更新されました";
                         });
                       },
-                      child: const Text(
-                        "更新",
-                      ),
+                      child: const Text("更新"),
                     ),
                     Text(result, style: const TextStyle(fontSize: 20)),
                   ],
