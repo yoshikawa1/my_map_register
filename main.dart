@@ -121,13 +121,7 @@ class MapSampleState extends State<MapSample> {
                         markers: _markers,
                         onLongPress: (LatLng latLng) {
                           setState(() {
-                            _markers.add(Marker(
-                              icon: BitmapDescriptor.defaultMarkerWithHue(
-                                  BitmapDescriptor.hueYellow),
-                              markerId: const MarkerId('marker_1'),
-                              position: latLng,
-                              // onTap: () => callback(""),
-                            ));
+                            createNewMarker(markerTapped, latLng);
                           });
                         },
                         onMapCreated: (GoogleMapController controller) {
@@ -295,39 +289,61 @@ class MapSampleState extends State<MapSample> {
   }
 
   markerTapped(String documentIdL) async {
-    final doc = await FirebaseFirestore.instance
-        .collection('maps')
-        .doc(documentIdL)
-        .get();
+    if (documentIdL != "") {
+      final doc = await FirebaseFirestore.instance
+          .collection('maps')
+          .doc(documentIdL)
+          .get();
 
-    setState(() {
-      name = TextEditingController(text: doc.get('name'));
-      installationPlace = TextEditingController(text: doc.get('place'));
-      monday = TextEditingController(text: doc.get('monday'));
-      tuesday = TextEditingController(text: doc.get('tuesday'));
-      wednesday = TextEditingController(text: doc.get('wednesday'));
-      thursday = TextEditingController(text: doc.get('thursday'));
-      friday = TextEditingController(text: doc.get('friday'));
-      saturday = TextEditingController(text: doc.get('saturday'));
-      sunday = TextEditingController(text: doc.get('sunday'));
-      address = TextEditingController(text: doc.get('address'));
-      tel = TextEditingController(text: doc.get('tel'));
-      note = TextEditingController(text: doc.get('note'));
-      quote = TextEditingController(text: doc.get('quote'));
-      documentId = documentIdL;
-      try {
-        updateTime = DateFormat('yyyy年M月d日 kk:mm:ss')
-            .format(doc.get('updateTime').toDate());
-      } catch (e) {
+      setState(() {
+        name = TextEditingController(text: doc.get('name'));
+        installationPlace = TextEditingController(text: doc.get('place'));
+        monday = TextEditingController(text: doc.get('monday'));
+        tuesday = TextEditingController(text: doc.get('tuesday'));
+        wednesday = TextEditingController(text: doc.get('wednesday'));
+        thursday = TextEditingController(text: doc.get('thursday'));
+        friday = TextEditingController(text: doc.get('friday'));
+        saturday = TextEditingController(text: doc.get('saturday'));
+        sunday = TextEditingController(text: doc.get('sunday'));
+        address = TextEditingController(text: doc.get('address'));
+        tel = TextEditingController(text: doc.get('tel'));
+        note = TextEditingController(text: doc.get('note'));
+        quote = TextEditingController(text: doc.get('quote'));
+        documentId = documentIdL;
+        try {
+          updateTime = DateFormat('yyyy年M月d日 kk:mm:ss')
+              .format(doc.get('updateTime').toDate());
+        } catch (e) {
+          updateTime = "";
+        }
+        try {
+          updateId = doc.get('updateId');
+        } catch (e) {
+          updateId = "";
+        }
+        result = "";
+      });
+    } else {
+      setState(() {
+        name = TextEditingController(text: "");
+        installationPlace = TextEditingController(text: "");
+        monday = TextEditingController(text: "");
+        tuesday = TextEditingController(text: "");
+        wednesday = TextEditingController(text: "");
+        thursday = TextEditingController(text: "");
+        friday = TextEditingController(text: "");
+        saturday = TextEditingController(text: "");
+        sunday = TextEditingController(text: "");
+        address = TextEditingController(text: "");
+        tel = TextEditingController(text: "");
+        note = TextEditingController(text: "");
+        quote = TextEditingController(text: "");
+        documentId = "";
         updateTime = "";
-      }
-      try {
-        updateId = doc.get('updateId');
-      } catch (e) {
         updateId = "";
-      }
-      result = "";
-    });
+        result = "";
+      });
+    }
     _scaffoldKey.currentState?.openDrawer();
   }
 
@@ -403,4 +419,15 @@ class MapSampleState extends State<MapSample> {
       _markers = lMarkers;
     });
   }
+
+  void createNewMarker(void Function(String) callback, LatLng latLng) async {
+    _markers.add(Marker(
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+      markerId: const MarkerId('marker_1'),
+      position: latLng,
+      onTap: () => callback(""),
+    ));
+  }
 }
+
+//更新ボタンを登録/更新ボタンに変える
