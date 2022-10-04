@@ -4,6 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +34,6 @@ class MapSampleState extends State<MapSample> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = {};
-  TextEditingController documentId = TextEditingController(text: "");
   TextEditingController name = TextEditingController(text: "");
   TextEditingController installationPlace = TextEditingController(text: "");
   TextEditingController monday = TextEditingController(text: "");
@@ -46,6 +47,9 @@ class MapSampleState extends State<MapSample> {
   TextEditingController tel = TextEditingController(text: "");
   TextEditingController note = TextEditingController(text: "");
   TextEditingController quote = TextEditingController(text: "");
+  String documentId = "";
+  String updateTime = "";
+  String updateId = "";
   static const double textSmall = 8;
   static const double textMedium = 12;
   static const double textLarge = 18;
@@ -99,7 +103,7 @@ class MapSampleState extends State<MapSample> {
 
   MapContainer() {
     return Expanded(
-      child: Container(
+      child: SizedBox(
         width: 1000,
         height: 1500,
         child: Scaffold(
@@ -234,22 +238,63 @@ class MapSampleState extends State<MapSample> {
                         labelText: "引用",
                       ),
                     ),
-                    Visibility(
-                      visible: true,
-                      child: TextField(
-                        enabled: false,
-                        controller: documentId,
-                        maxLines: null,
-                        decoration: const InputDecoration(
-                          labelText: "ID",
-                        ),
+                    const SizedBox(height: 10),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: const Text(
+                        "ID",
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: Text(
+                        documentId,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: const Text(
+                        "更新日時",
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: Text(
+                        updateTime,
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: const Text(
+                        "更新者",
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      width: double.infinity,
+                      child: Text(
+                        updateId,
+                        textAlign: TextAlign.left,
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        var androidInfo = await DeviceInfoPlugin().androidInfo;
                         FirebaseFirestore.instance
                             .collection("maps")
-                            .doc(documentId.text)
+                            .doc(documentId)
                             .update({
                           'name': name.text,
                           'place': installationPlace.text,
@@ -264,6 +309,9 @@ class MapSampleState extends State<MapSample> {
                           'tel': tel.text,
                           'note': note.text,
                           'quote': quote.text,
+                          'updateTime': DateTime.now(),
+                          'updateId':
+                              '${androidInfo.model} \r\n ${androidInfo.id}',
                         });
                         setState(() {
                           result = "更新されました";
@@ -285,11 +333,12 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-  markerTapped(String documentIdS) async {
+  markerTapped(String documentIdL) async {
     final doc = await FirebaseFirestore.instance
         .collection('maps')
-        .doc(documentIdS)
+        .doc(documentIdL)
         .get();
+
     setState(() {
       name = TextEditingController(text: doc.get('name'));
       installationPlace = TextEditingController(text: doc.get('place'));
@@ -304,7 +353,18 @@ class MapSampleState extends State<MapSample> {
       tel = TextEditingController(text: doc.get('tel'));
       note = TextEditingController(text: doc.get('note'));
       quote = TextEditingController(text: doc.get('quote'));
-      documentId = TextEditingController(text: documentIdS);
+      documentId = documentIdL;
+      try {
+        updateTime = DateFormat('yyyy年M月d日 kk:mm:ss')
+            .format(doc.get('updateTime').toDate());
+      } catch (e) {
+        updateTime = "";
+      }
+      try {
+        updateId = doc.get('updateId');
+      } catch (e) {
+        updateId = "";
+      }
       result = "";
     });
     _scaffoldKey.currentState?.openDrawer();
