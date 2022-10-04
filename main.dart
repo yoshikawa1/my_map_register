@@ -311,7 +311,7 @@ class MapSampleState extends State<MapSample> {
                           'quote': quote.text,
                           'updateTime': DateTime.now(),
                           'updateId':
-                              '${androidInfo.model} \r\n ${androidInfo.id}',
+                              '${androidInfo.model}\r\n${androidInfo.id}',
                         });
                         setState(() {
                           result = "更新されました";
