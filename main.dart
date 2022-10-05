@@ -246,35 +246,50 @@ class MapSampleState extends State<MapSample> {
                       width: double.infinity,
                       child: Text(updateId, textAlign: TextAlign.left),
                     ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        var androidInfo = await DeviceInfoPlugin().androidInfo;
-                        FirebaseFirestore.instance
-                            .collection("maps")
-                            .doc(documentId)
-                            .update({
-                          'name': name.text,
-                          'place': installationPlace.text,
-                          'monday': monday.text,
-                          'tuesday': tuesday.text,
-                          'wednesday': wednesday.text,
-                          'thursday': thursday.text,
-                          'friday': friday.text,
-                          'saturday': saturday.text,
-                          'sunday': sunday.text,
-                          'address': address.text,
-                          'tel': tel.text,
-                          'note': note.text,
-                          'quote': quote.text,
-                          'updateTime': DateTime.now(),
-                          'updateId':
-                              '${androidInfo.model}\r\n${androidInfo.id}',
-                        });
-                        setState(() {
-                          result = "更新されました";
-                        });
-                      },
-                      child: const Text("更新"),
+                    Text(result, style: const TextStyle(fontSize: 20)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed: () async {
+                            var androidInfo =
+                                await DeviceInfoPlugin().androidInfo;
+                            FirebaseFirestore.instance
+                                .collection("maps")
+                                .doc(documentId)
+                                .update({
+                              'name': name.text,
+                              'place': installationPlace.text,
+                              'monday': monday.text,
+                              'tuesday': tuesday.text,
+                              'wednesday': wednesday.text,
+                              'thursday': thursday.text,
+                              'friday': friday.text,
+                              'saturday': saturday.text,
+                              'sunday': sunday.text,
+                              'address': address.text,
+                              'tel': tel.text,
+                              'note': note.text,
+                              'quote': quote.text,
+                              'updateTime': DateTime.now(),
+                              'updateId':
+                                  '${androidInfo.model}\r\n${androidInfo.id}',
+                            });
+                            setState(() {
+                              result = "更新されました";
+                            });
+                          },
+                          child: const Text("更新"),
+                        ),
+                        Text(result, style: const TextStyle(fontSize: 20)),
+                        ElevatedButton(
+                          onPressed: () async {
+                            var a = _showDialog(documentId);
+                            print(a);
+                          },
+                          child: const Text("削除"),
+                        ),
+                      ],
                     ),
                     Text(result, style: const TextStyle(fontSize: 20)),
                   ],
@@ -428,6 +443,34 @@ class MapSampleState extends State<MapSample> {
       onTap: () => callback(""),
     ));
   }
+
+  Future _showDialog(documentId) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('AlertDialog'),
+        content: const Text('アラートダイアログです。YesかNoを選択してください。'),
+        actions: <Widget>[
+          SimpleDialogOption(
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.pop(context);
+              print(documentId);
+            },
+          ),
+          SimpleDialogOption(
+            child: const Text('NO'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
+//削除ボタン作成 アラート作成 済
+//削除ボタン作成 削除処理作成 DBとマーカーを消す
+//ロングタップ時にDBに空登録してからマーカー作成してドロワーも開く
 //更新ボタンを登録/更新ボタンに変える
