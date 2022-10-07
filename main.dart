@@ -246,7 +246,7 @@ class MapSampleState extends State<MapSample> {
                       width: double.infinity,
                       child: Text(updateId, textAlign: TextAlign.left),
                     ),
-                    Text(result, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -276,16 +276,14 @@ class MapSampleState extends State<MapSample> {
                                   '${androidInfo.model}\r\n${androidInfo.id}',
                             });
                             setState(() {
-                              result = "更新されました";
+                              result = "更新しました";
                             });
                           },
                           child: const Text("更新"),
                         ),
-                        Text(result, style: const TextStyle(fontSize: 20)),
                         ElevatedButton(
                           onPressed: () async {
-                            var a = _showDialog(documentId);
-                            print(a);
+                            _showDialog(documentId);
                           },
                           child: const Text("削除"),
                         ),
@@ -435,27 +433,60 @@ class MapSampleState extends State<MapSample> {
     });
   }
 
-  void createNewMarker(void Function(String) callback, LatLng latLng) async {
-    _markers.add(Marker(
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-      markerId: const MarkerId('marker_1'),
-      position: latLng,
-      onTap: () => callback(""),
-    ));
+  void createNewMarker(void Function(String) callback, latLng) async {
+    var androidInfo = await DeviceInfoPlugin().androidInfo;
+    await FirebaseFirestore.instance.collection('maps').add({
+      'lat': latLng.latitude,
+      'lng': latLng.longitude,
+      'name': "",
+      'place': "",
+      'monday': "",
+      'tuesday': "",
+      'wednesday': "",
+      'thursday': "",
+      'friday': "",
+      'saturday': "",
+      'sunday': "",
+      'address': "",
+      'tel': "",
+      'note': "",
+      'quote': "",
+      'updateTime': DateTime.now(),
+      'updateId': '${androidInfo.model}\r\n${androidInfo.id}',
+    }).then((value) {
+      setState(() {
+        _markers.add(Marker(
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          markerId: MarkerId(value.id),
+          position: latLng,
+          onTap: () => callback(value.id),
+        ));
+      });
+      result = "空のマーカーを登録しました。\r\n各項目を入力して更新ボタンを押してください。";
+    });
   }
 
   Future _showDialog(documentId) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('AlertDialog'),
-        content: const Text('アラートダイアログです。YesかNoを選択してください。'),
+        title: const Text('削除してもよろしいですか？'),
+        content: const Text('一度削除すると復元出来ません。'),
         actions: <Widget>[
           SimpleDialogOption(
             child: const Text('Yes'),
             onPressed: () {
+              FirebaseFirestore.instance
+                  .collection("maps")
+                  .doc(documentId)
+                  .delete();
+              setState(() {
+                result = "削除しました";
+                _markers.remove(_markers.firstWhere(
+                    (Marker marker) => marker.markerId.value == documentId));
+              });
               Navigator.pop(context);
-              print(documentId);
             },
           ),
           SimpleDialogOption(
@@ -469,8 +500,3 @@ class MapSampleState extends State<MapSample> {
     );
   }
 }
-
-//削除ボタン作成 アラート作成 済
-//削除ボタン作成 削除処理作成 DBとマーカーを消す
-//ロングタップ時にDBに空登録してからマーカー作成してドロワーも開く
-//更新ボタンを登録/更新ボタンに変える
