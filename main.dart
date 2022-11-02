@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -159,12 +160,15 @@ class MapSampleState extends State<MapSample> {
                       maxLines: null,
                       decoration: const InputDecoration(labelText: "設置場所"),
                     ),
-                    TextField(
+                    TextFormField(
                       controller: monday,
                       maxLines: null,
                       decoration: const InputDecoration(labelText: "月曜日"),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9:～,]')),
+                      ],
                     ),
-                    TextField(
+                    TextFormField(
                       controller: tuesday,
                       maxLines: null,
                       decoration: const InputDecoration(labelText: "火曜日"),
@@ -500,3 +504,4 @@ class MapSampleState extends State<MapSample> {
     );
   }
 }
+// 残タスク　時間の入力をピッカーにするか、validateするか
